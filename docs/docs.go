@@ -24,7 +24,72 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/example/helloworld": {
+        "/api/v1/customers/:id": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update customer by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Update Customer",
+                "operationId": "UpdateCustomer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of customer to be updated",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Customer data to be updated",
+                        "name": "Customer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CustomerForUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/example/helloworld": {
             "get": {
                 "description": "do ping",
                 "consumes": [
@@ -46,6 +111,79 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/healthcheck": {
+            "get": {
+                "description": "Health checking for the service",
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Health Check",
+                "operationId": "HealthCheckHandler",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.CustomerForUpdate": {
+            "type": "object",
+            "required": [
+                "email",
+                "firstname",
+                "lastname"
+            ],
+            "properties": {
+                "email": {
+                    "description": "Customer E-mail",
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "choo@gmail.com"
+                },
+                "firstname": {
+                    "description": "Customer Firstname",
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Choopong"
+                },
+                "gender": {
+                    "description": "Customer Gender",
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female"
+                    ],
+                    "example": "male"
+                },
+                "lastname": {
+                    "description": "Customer Lastname",
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Choosamer"
+                }
+            }
+        },
+        "model.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "Response Code",
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Response Status",
+                    "type": "string"
+                }
+            }
         }
     },
     "securityDefinitions": {
@@ -63,7 +201,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "go-playground-gllp.onrender.com",
-	BasePath:         "/api/v1",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Swagger Example API",
 	Description:      "This is a sample server celler server.",
