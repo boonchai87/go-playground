@@ -165,7 +165,7 @@ func main() {
 			users.GET("", userHandler.ListUserHandler)
 			users.GET(":id", userHandler.GetUserHandler)
 			users.POST("", userHandler.CreateUserHandler)
-			users.PUT(":id", userHandler.UpdateUserHandler)
+			users.PATCH(":id", userHandler.UpdateUserHandler)
 			users.DELETE(":id", userHandler.DeleteUserHandler)
 		}
 	}

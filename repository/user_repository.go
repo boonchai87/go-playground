@@ -11,7 +11,7 @@ type UserRepository struct {
 }
 
 func (h UserRepository) GetAllUser() ([]model.User, error) {
-	var objects []model.User
+	var objects []model.User = make([]model.User, 0) // blank array
 
 	rows, err := h.DB.Query("SELECT id,name,username,email FROM users ")
 	if err != nil {
@@ -33,11 +33,11 @@ func (h UserRepository) GetAllUser() ([]model.User, error) {
 	return objects, nil
 }
 func (h UserRepository) GetUser(id string) (*model.User, error) {
-	query := "SELECT * FROM users WHERE id = $1"
+	query := "SELECT id,name,email,username,password FROM users WHERE id = $1"
 	row := h.DB.QueryRow(query, id)
 
 	user := &model.User{}
-	err := row.Scan(&user.ID, &user.Name, &user.Email)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Username, &user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -57,17 +57,17 @@ func (h UserRepository) CreateUser(user model.UserForCreate) (int, error) {
 	defer rows.Close()
 	lastId := 0
 	for rows.Next() {
-		var alb model.UserForCreate
-		if err := rows.Scan(&alb.ID, &alb.Name, &alb.Email, &alb.Password, &alb.Username); err != nil {
+		var obj model.UserForCreate
+		if err := rows.Scan(&obj.ID, &obj.Name, &obj.Email, &obj.Password, &obj.Username); err != nil {
+			fmt.Print(err)
 			panic(err)
+
 		}
-		//lastId, err := strconv.Atoi(alb.ID)
-		lastId = alb.ID
-		if err != nil {
-			// ... handle error
-			panic(err)
-		}
-		fmt.Printf("ID: %d", alb.ID)
+
+		lastId = obj.ID
+		fmt.Printf("lastId= %d", lastId)
+
+		fmt.Printf("ID: %d", obj.ID)
 	}
 	//id, err := result.LastInsertId()
 	// fmt.Printf("ddddddddddddddd %d", id)
@@ -77,11 +77,12 @@ func (h UserRepository) CreateUser(user model.UserForCreate) (int, error) {
 	return lastId, nil
 }
 
-func (h UserRepository) UpdateUser(user model.UserForUpdate) error {
-
+func (h UserRepository) UpdateUser(user model.UserForUpdate, id string) error {
+	fmt.Print("update")
 	query := "UPDATE users SET name = $1, email = $2,password=$3,username=$4 WHERE id = $5"
-	_, err := h.DB.Exec(query, user.Name, user.Email, user.Password, user.Username, user.ID)
+	_, err := h.DB.Exec(query, user.Name, user.Email, user.Password, user.Username, id)
 	if err != nil {
+		fmt.Print(err)
 		return err
 	}
 	return nil

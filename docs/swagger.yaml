@@ -37,10 +37,11 @@ definitions:
         example: choo@gmail.com
         maxLength: 255
         type: string
-      id:
-        type: integer
       name:
-        description: ID int `json:"id"`
+        type: string
+      password:
+        example: dxdfasd
+        maxLength: 255
         type: string
       username:
         description: Username
@@ -49,8 +50,7 @@ definitions:
         type: string
     required:
     - email
-    - email
-    - username
+    - password
     - username
     type: object
   model.UserForUpdate:
@@ -60,9 +60,12 @@ definitions:
         example: choo@gmail.com
         maxLength: 255
         type: string
-      id:
-        type: integer
       name:
+        description: ID       int    `json:"id"`
+        type: string
+      password:
+        example: xxxx
+        maxLength: 255
         type: string
       username:
         description: Username
@@ -71,6 +74,7 @@ definitions:
         type: string
     required:
     - email
+    - password
     - username
     type: object
   model.Users:
@@ -182,7 +186,7 @@ paths:
       summary: Create User
       tags:
       - users
-  /api/v1/users/:id:
+  /api/v1/users/{id}:
     delete:
       consumes:
       - application/json
@@ -257,7 +261,7 @@ paths:
       summary: Get User
       tags:
       - users
-    post:
+    patch:
       consumes:
       - application/json
       description: Update customer by id

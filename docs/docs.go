@@ -156,7 +156,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/:id": {
+        "/api/v1/users/{id}": {
             "get": {
                 "security": [
                     {
@@ -217,7 +217,61 @@ const docTemplate = `{
                     }
                 }
             },
-            "post": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete user by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete User",
+                "operationId": "DeleteUser",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of user to be deleted",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            },
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -251,60 +305,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.UserForUpdate"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete user by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Delete User",
-                "operationId": "DeleteUser",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "id of user to be deleted",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -402,8 +402,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "email",
-                "username",
+                "password",
                 "username"
             ],
             "properties": {
@@ -413,12 +412,13 @@ const docTemplate = `{
                     "maxLength": 255,
                     "example": "choo@gmail.com"
                 },
-                "id": {
-                    "type": "integer"
-                },
                 "name": {
-                    "description": "ID int ` + "`" + `json:\"id\"` + "`" + `",
                     "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "dxdfasd"
                 },
                 "username": {
                     "description": "Username",
@@ -432,6 +432,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
+                "password",
                 "username"
             ],
             "properties": {
@@ -441,11 +442,14 @@ const docTemplate = `{
                     "maxLength": 255,
                     "example": "choo@gmail.com"
                 },
-                "id": {
-                    "type": "integer"
-                },
                 "name": {
+                    "description": "ID       int    ` + "`" + `json:\"id\"` + "`" + `",
                     "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "xxxx"
                 },
                 "username": {
                     "description": "Username",

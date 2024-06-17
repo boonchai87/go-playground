@@ -27,7 +27,7 @@ type UserHandler struct {
 // @response 401 {object} model.Response "Unauthorized"
 // @response 409 {object} model.Response "Conflict"
 // @response 500 {object} model.Response "Internal Server Error"
-// @Router /api/v1/users/:id [get]
+// @Router /api/v1/users/{id} [get]
 func (h UserHandler) GetUserHandler(c *gin.Context) {
 
 	userId := c.Param("id")
@@ -36,8 +36,10 @@ func (h UserHandler) GetUserHandler(c *gin.Context) {
 	userRepository := repository.UserRepository{
 		DB: h.DB,
 	}
+	fmt.Print("userid  dddd" + userId)
 	user, err := userRepository.GetUser(userId)
 	if err != nil {
+		fmt.Print(err)
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
 	}
@@ -96,8 +98,10 @@ func (h UserHandler) CreateUserHandler(c *gin.Context) {
 	// Call BindJSON to bind the received JSON to
 	// newAlbum.
 	if err := c.BindJSON(&newUser); err != nil {
+		fmt.Print(err)
 		return
 	}
+	fmt.Printf("%+v\n", newUser)
 
 	// insert into database
 	userRepository := repository.UserRepository{
@@ -125,7 +129,7 @@ func (h UserHandler) CreateUserHandler(c *gin.Context) {
 // @response 400 {object} model.Response "Bad Request"
 // @response 401 {object} model.Response "Unauthorized"
 // @response 500 {object} model.Response "Internal Server Error"
-// @Router /api/v1/users/:id [delete]
+// @Router /api/v1/users/{id} [delete]
 func (h UserHandler) DeleteUserHandler(c *gin.Context) {
 
 	userId := c.Param("id")
@@ -154,18 +158,21 @@ func (h UserHandler) DeleteUserHandler(c *gin.Context) {
 // @response 400 {object} model.Response "Bad Request"
 // @response 401 {object} model.Response "Unauthorized"
 // @response 500 {object} model.Response "Internal Server Error"
-// @Router /api/v1/users/:id [post]
+// @Router /api/v1/users/{id} [patch]
 func (h UserHandler) UpdateUserHandler(c *gin.Context) {
+	userId := c.Param("id")
+	fmt.Print("dfadf" + userId)
 	var oldUser model.UserForUpdate
 	//var err error
 	if err := c.BindJSON(&oldUser); err != nil {
+		fmt.Print(err)
 		return
 	}
 	// insert into database
 	userRepository := repository.UserRepository{
 		DB: h.DB,
 	}
-	err := userRepository.UpdateUser(oldUser)
+	err := userRepository.UpdateUser(oldUser, userId)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
