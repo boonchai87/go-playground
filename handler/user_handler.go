@@ -58,7 +58,7 @@ func (h UserHandler) GetUserHandler(c *gin.Context) {
 // @response 401 {object} model.Response "Unauthorized"
 // @response 409 {object} model.Response "Conflict"
 // @response 500 {object} model.Response "Internal Server Error"
-// @Router /api/v1/users/:id [get]
+// @Router /api/v1/users [get]
 func (h UserHandler) ListUserHandler(c *gin.Context) {
 
 	// Call the GetUser function to fetch the user data from the database

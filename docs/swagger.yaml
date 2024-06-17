@@ -113,6 +113,39 @@ paths:
       tags:
       - example
   /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get all user
+      operationId: ListUsers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List User
+      tags:
+      - users
     post:
       consumes:
       - application/json
@@ -188,15 +221,21 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get all user
-      operationId: ListUsers
+      description: Get User by id
+      operationId: GetUser
+      parameters:
+      - description: id of customer to be gotten
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Users'
+            $ref: '#/definitions/model.User'
         "400":
           description: Bad Request
           schema:
@@ -215,7 +254,7 @@ paths:
             $ref: '#/definitions/model.Response'
       security:
       - ApiKeyAuth: []
-      summary: List User
+      summary: Get User
       tags:
       - users
     post:

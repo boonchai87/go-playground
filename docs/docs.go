@@ -48,6 +48,57 @@ const docTemplate = `{
             }
         },
         "/api/v1/users": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "List User",
+                "operationId": "ListUsers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Users"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -112,7 +163,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all user",
+                "description": "Get User by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -122,13 +173,22 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "List User",
-                "operationId": "ListUsers",
+                "summary": "Get User",
+                "operationId": "GetUser",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of customer to be gotten",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Users"
+                            "$ref": "#/definitions/model.User"
                         }
                     },
                     "400": {
