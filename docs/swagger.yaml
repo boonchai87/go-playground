@@ -120,6 +120,76 @@ definitions:
         description: Response Status
         type: string
     type: object
+  model.User:
+    properties:
+      email:
+        description: E-mail
+        example: choo@gmail.com
+        maxLength: 255
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      username:
+        description: Username
+        example: choo
+        maxLength: 255
+        type: string
+    required:
+    - email
+    - username
+    type: object
+  model.UserForCreate:
+    properties:
+      email:
+        description: E-mail
+        example: choo@gmail.com
+        maxLength: 255
+        type: string
+      id:
+        type: integer
+      name:
+        description: ID int `json:"id"`
+        type: string
+      username:
+        description: Username
+        example: choo
+        maxLength: 255
+        type: string
+    required:
+    - email
+    - email
+    - username
+    - username
+    type: object
+  model.UserForUpdate:
+    properties:
+      email:
+        description: E-mail
+        example: choo@gmail.com
+        maxLength: 255
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      username:
+        description: Username
+        example: choo
+        maxLength: 255
+        type: string
+    required:
+    - email
+    - username
+    type: object
+  model.Users:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -246,21 +316,15 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get customer by id
-      operationId: GetCustomer
-      parameters:
-      - description: id of customer to be gotten
-        in: path
-        name: id
-        required: true
-        type: integer
+      description: Get all user
+      operationId: ListUsers
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Customer'
+            $ref: '#/definitions/model.Users'
         "400":
           description: Bad Request
           schema:
@@ -279,9 +343,9 @@ paths:
             $ref: '#/definitions/model.Response'
       security:
       - ApiKeyAuth: []
-      summary: Get Customer
+      summary: List User
       tags:
-      - customers
+      - users
     patch:
       consumes:
       - application/json
@@ -338,6 +402,159 @@ paths:
       summary: ping example
       tags:
       - example
+  /api/v1/users:
+    post:
+      consumes:
+      - application/json
+      description: Create new user
+      operationId: CreateUser
+      parameters:
+      - description: User data to be created
+        in: body
+        name: Customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserForCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create User
+      tags:
+      - users
+  /api/v1/users/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by id
+      operationId: DeleteUser
+      parameters:
+      - description: id of user to be deleted
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete User
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get User by id
+      operationId: GetUser
+      parameters:
+      - description: id of customer to be gotten
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Update customer by id
+      operationId: UpdateCustomer
+      parameters:
+      - description: id of user to be updated
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User data to be updated
+        in: body
+        name: Customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserForUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Customer
+      tags:
+      - users
   /healthcheck:
     get:
       description: Health checking for the service

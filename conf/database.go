@@ -19,6 +19,7 @@ func ConnectDB() (DB *sql.DB, err error) {
 	dbName := os.Getenv("POSTGRES_DBNAME")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	sslmode := os.Getenv("POSTGRES_SSLMODE")
+
 	var connstring = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", host, port, username, password, dbName, sslmode)
 
 	//connstring := "user=postgres dbname=postgres password='root' host=localhost port=5432 sslmode=disable"

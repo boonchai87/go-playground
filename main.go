@@ -238,7 +238,6 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 	// fmt.Printf("Album found: %v\n", alb)
-
 	router.Run(":" + port)
 }
 
