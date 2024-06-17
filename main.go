@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"example/hello/conf"
 	"example/hello/docs"
 	"example/hello/handler"
 	"fmt"
@@ -10,9 +11,9 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-sql-driver/mysql"
 	"rsc.io/quote"
 
+	_ "github.com/lib/pq"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -77,6 +78,42 @@ func main() {
 
 	router := gin.Default()
 
+	// connect db
+	//fmt.Print(os.Getenv("MYSQL_HOST") + "," + os.Getenv("MYSQL_PASS"))
+	// var mysql_user = os.Getenv("MYSQL_USER")
+	// var mysql_password = os.Getenv("MYSQL_PASSWORD")
+	// https://go.dev/doc/tutorial/database-access
+	//fmt.Print("xxxx" + mysql_user + "," + mysql_password)
+	// cfg := mysql.Config{
+	// 	User:   mysql_user,
+	// 	Passwd: mysql_password,
+	// 	Net:    "tcp",
+	// 	Addr:   "127.0.0.1:3306",
+	// 	DBName: "mydb",
+	// }
+
+	//Get a database handle.
+	var err error
+	//db, err = sql.Open("mysql", cfg.FormatDSN())
+
+	//postgresql
+	//var dataSoruce = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", "localhost", 5432, "postgres", "root", "postgres", "disable")
+	//connstring := "user='postgres' dbname='postgres' password='root' host=localhost port=5432 sslmode=disable"
+	//fmt.Print(dataSoruce)
+	//db, err := sql.Open("postgres", dataSoruce)
+
+	db, err := conf.ConnectDB()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pingErr := db.Ping()
+	if pingErr != nil {
+		log.Fatal(pingErr)
+	}
+	fmt.Println("Connected!")
+
 	router.Use(gin.Logger())
 	router.LoadHTMLGlob("templates/*.tmpl.html")
 	router.Static("/static", "static")
@@ -94,11 +131,15 @@ func main() {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	router.GET("/healthcheck", handler.HealthCheckHandler)
+	// https://smalldoc124.medium.com/golang-%E0%B9%80%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%A1%E0%B8%81%E0%B8%B1%E0%B8%9A-db-postgres-2c43e9555eeb
 
-	router.POST("/user", createUserHandler)
-	router.GET("/user/:id", getUserHandler)
-	router.PUT("/user/:id", updateUserHandler)
-	router.DELETE("/user/:id", deleteUserHandler)
+	// userHandler := handler.UserHandler{
+	// 	DB: db,
+	// }
+	// router.POST("/user", userHandler.CreateUserHandler)
+	// router.GET("/user/:id", userHandler.GetUserHandler)
+	// router.PUT("/user/:id", userHandler.UpdateUserHandler)
+	// router.DELETE("/user/:id", userHandler.DeleteUserHandler)
 
 	groupApiV1 := router.Group("/api/v1")
 	{
@@ -107,75 +148,96 @@ func main() {
 			eg.GET("/helloworld", Helloworld)
 		}
 		// https://medium.com/linedevth/%E0%B8%A3%E0%B8%A7%E0%B8%A1-tips-tricks%E0%B9%83%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%83%E0%B8%8A%E0%B9%89-swaggo-%E0%B8%AA%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%87-swagger-ui-%E0%B9%83%E0%B8%AB%E0%B9%89%E0%B8%81%E0%B8%B1%E0%B8%9A-gin-rest-api-76d08985e873
-		customers := groupApiV1.Group("/customers")
+		// customers := groupApiV1.Group("/customers")
+		// {
+		// 	customersHandler := handler.CustomerHandler{}
+		// 	customers.GET(":id", customersHandler.GetCustomer)
+		// 	customers.GET("", customersHandler.ListCustomers)
+		// 	customers.POST("", customersHandler.CreateCustomer)
+		// 	customers.DELETE(":id", customersHandler.DeleteCustomer)
+		// 	customers.PATCH(":id", customersHandler.UpdateCustomer)
+		// }
+		users := groupApiV1.Group("/users")
 		{
-			customersHandler := handler.CustomerHandler{}
-			customers.GET(":id", customersHandler.GetCustomer)
-			customers.GET("", customersHandler.ListCustomers)
-			customers.POST("", customersHandler.CreateCustomer)
-			customers.DELETE(":id", customersHandler.DeleteCustomer)
-			customers.PATCH(":id", customersHandler.UpdateCustomer)
+			userHandler := handler.UserHandler{
+				DB: db,
+			}
+			users.GET("", userHandler.ListUserHandler)
+			users.GET(":id", userHandler.GetUserHandler)
+			users.POST("", userHandler.CreateUserHandler)
+			users.PUT(":id", userHandler.UpdateUserHandler)
+			users.DELETE(":id", userHandler.DeleteUserHandler)
 		}
 	}
 	// mysql
-	const (
-		dbDriver = "mysql"
-		dbUser   = "root"
-		dbPass   = "root"
-		dbName   = "mydb"
-	)
-	//fmt.Print(os.Getenv("MYSQL_HOST") + "," + os.Getenv("MYSQL_PASS"))
-	var mysql_user = os.Getenv("MYSQL_USER")
-	var mysql_password = os.Getenv("MYSQL_PASSWORD")
-	// https://go.dev/doc/tutorial/database-access
-	//fmt.Print("xxxx" + mysql_user + "," + mysql_password)
-	cfg := mysql.Config{
-		User:   mysql_user,
-		Passwd: mysql_password,
-		Net:    "tcp",
-		Addr:   "127.0.0.1:3306",
-		DBName: "mydb",
-	}
+	// const (
+	// 	dbDriver = "mysql"
+	// 	dbUser   = "root"
+	// 	dbPass   = "root"
+	// 	dbName   = "mydb"
+	// )
 
-	//Get a database handle.
-	var err error
-	db, err = sql.Open("mysql", cfg.FormatDSN())
-	//postgresql
-	//connstring := "user=postgres dbname=postgres password='*****' host=localhost port=5432 sslmode=disable"
-	//db, err := sql.Open("postgres", connstring)
+	// _, err = db.Exec("INSERT INTO  album(title,artist,price) VALUES($1,$2,$3)", "test", "neng", 35.5)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println("value inserted")
+	// }
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// // read
+	// rows, err := db.Query("SELECT * FROM album")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer rows.Close()
+	// lastId := ""
+	// for rows.Next() {
+	// 	var alb Album
+	// 	if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
+	// 		panic(err)
+	// 	}
+	// 	lastId = alb.ID
+	// 	fmt.Printf("ID: %d, Name: %s\n", alb.ID, alb.Title)
+	// }
 
-	pingErr := db.Ping()
-	if pingErr != nil {
-		log.Fatal(pingErr)
-	}
-	fmt.Println("Connected!")
+	// // update
+	// title := "Eddie"
+	// _, err = db.Exec("UPDATE album SET title=$1,artist=$2 WHERE id=$3", title, lastId)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println("Data updated")
+	// }
+	// // delete
+	// _, err = db.Exec("DELETE FROM album WHERE id=$1", lastId)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println("Data deleted")
+	// }
 
-	albums, err := albumsByArtist("John Coltrane")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Albums found: %v\n", albums)
+	// albID, err := addAlbum(Album{
+	// 	Title:  "The Modern Sound of Betty Carter",
+	// 	Artist: "Betty Carter",
+	// 	Price:  49.99,
+	// })
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("ID of added album: %v\n", albID)
 
-	// Hard-code ID 2 here to test the query.
-	alb, err := albumByID(2)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Album found: %v\n", alb)
+	// albums, err := albumsByArtist("Betty Carter")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("Albums found: %v\n", albums)
 
-	albID, err := addAlbum(Album{
-		Title:  "The Modern Sound of Betty Carter",
-		Artist: "Betty Carter",
-		Price:  49.99,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("ID of added album: %v\n", albID)
+	// // Hard-code ID 2 here to test the query.
+	// alb, err := albumByID(2)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("Album found: %v\n", alb)
 
 	router.Run(":" + port)
 }
@@ -206,6 +268,7 @@ func albumsByArtist(name string) ([]Album, error) {
 
 	rows, err := db.Query("SELECT * FROM album WHERE artist = ?", name)
 	if err != nil {
+		fmt.Printf("Eroor: %v\n", err)
 		return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
 	}
 	defer rows.Close()
@@ -283,108 +346,108 @@ func getAlbumByID(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
-// ------------------- user handler
+//
 // https://www.honeybadger.io/blog/how-to-create-crud-application-with-golang-and-mysql/
-func getUserHandler(c *gin.Context) {
+// func getUserHandler(c *gin.Context) {
 
-	userId := c.Param("id")
-	fmt.Print(c.Param("id"))
-	// Convert 'id' to an integer
-	//userID, err := strconv.Atoi(idStr)
+// 	userId := c.Param("id")
+// 	fmt.Print(c.Param("id"))
+// 	// Convert 'id' to an integer
+// 	//userID, err := strconv.Atoi(idStr)
 
-	// Call the GetUser function to fetch the user data from the database
-	user, err := GetUser(userId)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
-		return
-	}
-	// Convert the user object to JSON and send it in the response
-	c.IndentedJSON(http.StatusOK, user)
-}
-func GetUser(id string) (*User, error) {
-	query := "SELECT * FROM users WHERE id = ?"
-	row := db.QueryRow(query, id)
+// 	// Call the GetUser function to fetch the user data from the database
+// 	user, err := GetUser(userId)
+// 	if err != nil {
+// 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
+// 		return
+// 	}
+// 	// Convert the user object to JSON and send it in the response
+// 	c.IndentedJSON(http.StatusOK, user)
+// }
+// func GetUser(id string) (*User, error) {
+// 	query := "SELECT * FROM users WHERE id = ?"
+// 	row := db.QueryRow(query, id)
 
-	user := &User{}
-	err := row.Scan(&user.ID, &user.Name, &user.Email)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
+// 	user := &User{}
+// 	err := row.Scan(&user.ID, &user.Name, &user.Email)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return user, nil
+// }
 
-func createUserHandler(c *gin.Context) {
-	var newUser User
-	var err error
-	// Call BindJSON to bind the received JSON to
-	// newAlbum.
-	if err := c.BindJSON(&newUser); err != nil {
-		return
-	}
+// func createUserHandler(c *gin.Context) {
+// 	var newUser User
+// 	var err error
+// 	// Call BindJSON to bind the received JSON to
+// 	// newAlbum.
+// 	if err := c.BindJSON(&newUser); err != nil {
+// 		return
+// 	}
 
-	// insert into database
-	id, err := CreateUser(newUser.Name, newUser.Email)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, "failed to create user")
-		return
-	}
-	newUser.ID = id
-	c.IndentedJSON(http.StatusCreated, newUser)
-}
-func CreateUser(name, email string) (int64, error) {
-	query := "INSERT INTO users (name, email) VALUES (?, ?)"
-	result, err := db.Exec(query, name, email)
-	if err != nil {
-		return 0, fmt.Errorf("addAlbum: %v", err)
-	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
-}
+// 	// insert into database
+// 	id, err := CreateUser(newUser.Name, newUser.Email)
+// 	if err != nil {
+// 		c.IndentedJSON(http.StatusInternalServerError, "failed to create user")
+// 		return
+// 	}
+// 	newUser.ID = id
+// 	c.IndentedJSON(http.StatusCreated, newUser)
+// }
+// func CreateUser(name, email string) (int64, error) {
+// 	query := "INSERT INTO users (name, email) VALUES (?, ?)"
+// 	result, err := db.Exec(query, name, email)
+// 	if err != nil {
+// 		return 0, fmt.Errorf("addAlbum: %v", err)
+// 	}
+// 	id, err := result.LastInsertId()
+// 	if err != nil {
+// 		return 0, err
+// 	}
+// 	return id, nil
+// }
 
-func updateUserHandler(c *gin.Context) {
-	userID := c.Param("id")
-	var oldUser User
-	//var err error
-	if err := c.BindJSON(&oldUser); err != nil {
-		return
-	}
-	err := UpdateUser(userID, oldUser.Name, oldUser.Email)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
-		return
-	}
-	c.IndentedJSON(http.StatusOK, "User updated successfully")
-}
+// func updateUserHandler(c *gin.Context) {
+// 	userID := c.Param("id")
+// 	var oldUser User
+// 	//var err error
+// 	if err := c.BindJSON(&oldUser); err != nil {
+// 		return
+// 	}
+// 	err := UpdateUser(userID, oldUser.Name, oldUser.Email)
+// 	if err != nil {
+// 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
+// 		return
+// 	}
+// 	c.IndentedJSON(http.StatusOK, "User updated successfully")
+// }
 
-func UpdateUser(id string, name, email string) error {
-	query := "UPDATE users SET name = ?, email = ? WHERE id = ?"
-	_, err := db.Exec(query, name, email, id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+// func UpdateUser(id string, name, email string) error {
+// 	query := "UPDATE users SET name = ?, email = ? WHERE id = ?"
+// 	_, err := db.Exec(query, name, email, id)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
 
-func deleteUserHandler(c *gin.Context) {
+// func deleteUserHandler(c *gin.Context) {
 
-	userId := c.Param("id")
+// 	userId := c.Param("id")
 
-	err := DeleteUser(userId)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
-		return
-	}
-	c.IndentedJSON(http.StatusNoContent, "User deleted  successfully")
-}
+// 	err := DeleteUser(userId)
+// 	if err != nil {
+// 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
+// 		return
+// 	}
+// 	c.IndentedJSON(http.StatusNoContent, "User deleted  successfully")
+// }
 
-func DeleteUser(id string) error {
-	query := "DELETE FROM users WHERE id = ?"
-	_, err := db.Exec(query, id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+// func DeleteUser(id string) error {
+// 	query := "DELETE FROM users WHERE id = ?"
+// 	_, err := db.Exec(query, id)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
