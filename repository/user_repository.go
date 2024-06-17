@@ -44,9 +44,9 @@ func (h UserRepository) GetUser(id string) (*model.User, error) {
 	return user, nil
 }
 
-func (h UserRepository) CreateUser(name, email string) (int, error) {
+func (h UserRepository) CreateUser(user model.UserForCreate) (int, error) {
 
-	_, err := h.DB.Exec("INSERT INTO users (name, email) VALUES ($1, $2)", name, email)
+	_, err := h.DB.Exec("INSERT INTO users (name, email,password,username) VALUES ($1, $2,$3,$4)", user.Name, user.Email, user.Password, user.Username)
 	if err != nil {
 		return 0, fmt.Errorf("addAlbum: %v", err)
 	}
@@ -77,10 +77,10 @@ func (h UserRepository) CreateUser(name, email string) (int, error) {
 	return lastId, nil
 }
 
-func (h UserRepository) UpdateUser(id string, name, email string) error {
+func (h UserRepository) UpdateUser(user model.UserForUpdate) error {
 
-	query := "UPDATE users SET name = $1, email = $2 WHERE id = $3"
-	_, err := h.DB.Exec(query, name, email, id)
+	query := "UPDATE users SET name = $1, email = $2,password=$3,username=$4 WHERE id = $5"
+	_, err := h.DB.Exec(query, user.Name, user.Email, user.Password, user.Username, user.ID)
 	if err != nil {
 		return err
 	}

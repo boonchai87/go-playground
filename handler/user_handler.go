@@ -91,7 +91,7 @@ func (h UserHandler) ListUserHandler(c *gin.Context) {
 // @response 500 {object} model.Response "Internal Server Error"
 // @Router /api/v1/users [post]
 func (h UserHandler) CreateUserHandler(c *gin.Context) {
-	var newUser model.User
+	var newUser model.UserForCreate
 	var err error
 	// Call BindJSON to bind the received JSON to
 	// newAlbum.
@@ -157,7 +157,7 @@ func (h UserHandler) DeleteUserHandler(c *gin.Context) {
 // @Router /api/v1/users/:id [post]
 func (h UserHandler) UpdateUserHandler(c *gin.Context) {
 	userID := c.Param("id")
-	var oldUser model.User
+	var oldUser model.UserForUpdate
 	//var err error
 	if err := c.BindJSON(&oldUser); err != nil {
 		return
