@@ -57,8 +57,8 @@ func (h UserRepository) CreateUser(user model.UserForCreate) (int, error) {
 	defer rows.Close()
 	lastId := 0
 	for rows.Next() {
-		var alb model.User
-		if err := rows.Scan(&alb.ID, &alb.Name, &alb.Email); err != nil {
+		var alb model.UserForCreate
+		if err := rows.Scan(&alb.ID, &alb.Name, &alb.Email, &alb.Password, &alb.Username); err != nil {
 			panic(err)
 		}
 		//lastId, err := strconv.Atoi(alb.ID)

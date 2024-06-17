@@ -103,7 +103,7 @@ func (h UserHandler) CreateUserHandler(c *gin.Context) {
 	userRepository := repository.UserRepository{
 		DB: h.DB,
 	}
-	id, err := userRepository.CreateUser(newUser.Name, newUser.Email)
+	id, err := userRepository.CreateUser(newUser)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, "failed to create userxxxx")
 		return
@@ -156,7 +156,6 @@ func (h UserHandler) DeleteUserHandler(c *gin.Context) {
 // @response 500 {object} model.Response "Internal Server Error"
 // @Router /api/v1/users/:id [post]
 func (h UserHandler) UpdateUserHandler(c *gin.Context) {
-	userID := c.Param("id")
 	var oldUser model.UserForUpdate
 	//var err error
 	if err := c.BindJSON(&oldUser); err != nil {
@@ -166,7 +165,7 @@ func (h UserHandler) UpdateUserHandler(c *gin.Context) {
 	userRepository := repository.UserRepository{
 		DB: h.DB,
 	}
-	err := userRepository.UpdateUser(userID, oldUser.Name, oldUser.Email)
+	err := userRepository.UpdateUser(oldUser)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
