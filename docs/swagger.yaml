@@ -1,0 +1,320 @@
+definitions:
+  model.Response:
+    properties:
+      code:
+        description: Response Code
+        type: integer
+      message:
+        type: string
+      status:
+        description: Response Status
+        type: string
+    type: object
+  model.User:
+    properties:
+      email:
+        description: E-mail
+        example: choo@gmail.com
+        maxLength: 255
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      username:
+        description: Username
+        example: choo
+        maxLength: 255
+        type: string
+    required:
+    - email
+    - username
+    type: object
+  model.UserForCreate:
+    properties:
+      email:
+        description: E-mail
+        example: choo@gmail.com
+        maxLength: 255
+        type: string
+      name:
+        type: string
+      password:
+        example: dxdfasd
+        maxLength: 255
+        type: string
+      username:
+        description: Username
+        example: choo
+        maxLength: 255
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  model.UserForUpdate:
+    properties:
+      email:
+        description: E-mail
+        example: choo@gmail.com
+        maxLength: 255
+        type: string
+      name:
+        description: ID       int    `json:"id"`
+        type: string
+      password:
+        example: xxxx
+        maxLength: 255
+        type: string
+      username:
+        description: Username
+        example: choo
+        maxLength: 255
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  model.Users:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: go-playground-gllp.onrender.com
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /api/v1/example/helloworld:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping example
+      tags:
+      - example
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get all user
+      operationId: ListUsers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List User
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create new user
+      operationId: CreateUser
+      parameters:
+      - description: User data to be created
+        in: body
+        name: Customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserForCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create User
+      tags:
+      - users
+  /api/v1/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by id
+      operationId: DeleteUser
+      parameters:
+      - description: id of user to be deleted
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete User
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get User by id
+      operationId: GetUser
+      parameters:
+      - description: id of customer to be gotten
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Update customer by id
+      operationId: UpdateCustomer
+      parameters:
+      - description: id of user to be updated
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User data to be updated
+        in: body
+        name: Customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserForUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Customer
+      tags:
+      - users
+  /healthcheck:
+    get:
+      description: Health checking for the service
+      operationId: HealthCheckHandler
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Health Check
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
