@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// https://www.honeybadger.io/blog/how-to-create-crud-application-with-golang-and-mysql/
 type UserHandler struct {
 	DB *sql.DB
 }
