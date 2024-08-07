@@ -12,7 +12,6 @@ type UserRepository struct {
 
 func (h UserRepository) GetAllUser() ([]model.User, error) {
 	var objects []model.User = make([]model.User, 0) // blank array
-
 	rows, err := h.DB.Query("SELECT id,name,username,email FROM users ")
 	if err != nil {
 		fmt.Printf("Eroor: %v\n", err)
@@ -61,12 +60,10 @@ func (h UserRepository) CreateUser(user model.UserForCreate) (int, error) {
 		if err := rows.Scan(&obj.ID, &obj.Name, &obj.Email, &obj.Password, &obj.Username); err != nil {
 			fmt.Print(err)
 			panic(err)
-
 		}
 
 		lastId = obj.ID
 		fmt.Printf("lastId= %d", lastId)
-
 		fmt.Printf("ID: %d", obj.ID)
 	}
 	//id, err := result.LastInsertId()
@@ -78,7 +75,7 @@ func (h UserRepository) CreateUser(user model.UserForCreate) (int, error) {
 }
 
 func (h UserRepository) UpdateUser(user model.UserForUpdate, id string) error {
-	fmt.Print("update")
+	fmt.Println("update")
 	query := "UPDATE users SET name = $1, email = $2,password=$3,username=$4 WHERE id = $5"
 	_, err := h.DB.Exec(query, user.Name, user.Email, user.Password, user.Username, id)
 	if err != nil {
@@ -89,7 +86,6 @@ func (h UserRepository) UpdateUser(user model.UserForUpdate, id string) error {
 }
 
 func (h UserRepository) DeleteUser(id string) error {
-
 	query := "DELETE FROM users WHERE id = $1"
 	_, err := h.DB.Exec(query, id)
 	if err != nil {

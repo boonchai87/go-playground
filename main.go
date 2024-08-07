@@ -58,9 +58,7 @@ func main() {
 
 	//Get a database handle.
 	var err error
-
 	db, err := conf.ConnectDB()
-
 	if err != nil {
 		log.Fatal(err)
 	}
